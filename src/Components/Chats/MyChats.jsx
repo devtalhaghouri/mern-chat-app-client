@@ -1,19 +1,19 @@
-import { useConfig, useMedia, useNetwork } from "../../hook/hook";
+import { useConfig, useMedia } from "../../hook/hook";
 import axios from "../../api/baseUrl";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { ChatState } from "../../Context/ChatProvider";
 import { Box, Text } from "@chakra-ui/react";
-
 import ChatLoading from "./ChatLoading";
 import { getSender } from "../../utils/ChatLogic";
 import GroupChatModal from "../Modals/GroupChatModal";
 const MyChats = () => {
+  const { token } = JSON.parse(localStorage.getItem("userInfo"));
+
   const isMobile = useMedia("(max-width: 768px)");
   const [loading, setLoading] = useState(false);
   const [loggedUser, setLoggedUser] = useState();
-
-  const { token } = JSON.parse(localStorage.getItem("userInfo"));
+  const config = useConfig(token);
 
   const { selectedChat, setSelectedChat, chats, setChats, fetchAgain } =
     ChatState();
@@ -22,7 +22,6 @@ const MyChats = () => {
   const handleFetchChats = async () => {
     try {
       setLoading(true);
-      const config = useConfig(token);
 
       const { data } = await axios.get("/chat", config);
       setChats(data);
@@ -37,12 +36,11 @@ const MyChats = () => {
   const handleSelectedChats = (chat) => {
     setSelectedChat(chat);
   };
+
   useEffect(() => {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     handleFetchChats();
   }, [fetchAgain]);
-
-  console.log(chats);
 
   return (
     <div
